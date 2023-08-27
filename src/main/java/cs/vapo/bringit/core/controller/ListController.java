@@ -26,8 +26,12 @@ public class ListController {
 
     @Operation(summary = "Creates a new list")
     @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "List was successfully created"),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "201", description = "List was successfully created", headers = @Header(
+                    name = "Resource-Id", description = "The location of the created resource", schema =
+            @Schema(type = "string")), content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", headers = @Header(
+                    name = "Error-Message", description = "Validation failed for request field", schema =
+            @Schema(type = "string")), content = @Content),
             @ApiResponse(responseCode = "500", description = "The server encountered an unexpected error", headers =
                 @Header(name = "Error-Message", description = "Exception occurred while creating list", schema =
                 @Schema(type = "string")), content = @Content)
