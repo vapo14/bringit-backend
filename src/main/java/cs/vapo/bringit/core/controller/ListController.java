@@ -2,6 +2,7 @@ package cs.vapo.bringit.core.controller;
 
 import cs.vapo.bringit.core.model.lists.CreateList;
 import cs.vapo.bringit.core.model.lists.ListInformationBasic;
+import cs.vapo.bringit.core.model.lists.PatchList;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -87,6 +88,55 @@ public class ListController {
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(method = RequestMethod.GET, value = "/{listId}")
     public ResponseEntity<Void> retrieveListInformation(@PathVariable("listId") final String listId) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Updates a list's attributes")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "List attributes were updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad Request", headers = @Header(
+                    name = "Error-Message", description = "Validation failed for request field", schema =
+            @Schema(type = "string")), content = @Content),
+            @ApiResponse(responseCode = "404", description = "The given list was not found", headers = @Header(name =
+                    "Error-Message", description = "The given list was not found", schema = @Schema(type = "string"))
+                    , content = @Content),
+            @ApiResponse(responseCode = "401", description = "The current user is not the owner of the requested list", headers =
+            @Header(name =
+                    "Error-Message", description = "The requested list does not belong to this user", schema =
+            @Schema(type = "string"))
+                    , content = @Content),
+            @ApiResponse(responseCode = "500", description = "The server encountered an unexpected error", headers =
+            @Header(name = "Error-Message", description = "Exception occurred while updating list", schema =
+            @Schema(type = "string")), content = @Content)
+    })
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequestMapping(method = RequestMethod.PATCH, value = "/{listId}")
+    public ResponseEntity<Void> updateList(@PathVariable("listId") final String listId,
+                                           @RequestBody final PatchList updateRequest) {
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Deletes a given list")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "List was successfully deleted"),
+            @ApiResponse(responseCode = "400", description = "Bad Request", headers = @Header(
+                    name = "Error-Message", description = "Validation failed for request field", schema =
+            @Schema(type = "string")), content = @Content),
+            @ApiResponse(responseCode = "404", description = "The given list was not found", headers = @Header(name =
+                    "Error-Message", description = "The given list was not found", schema = @Schema(type = "string"))
+                    , content = @Content),
+            @ApiResponse(responseCode = "401", description = "The current user is not the owner of the requested list", headers =
+            @Header(name =
+                    "Error-Message", description = "The requested list does not belong to this user", schema =
+            @Schema(type = "string"))
+                    , content = @Content),
+            @ApiResponse(responseCode = "500", description = "The server encountered an unexpected error", headers =
+            @Header(name = "Error-Message", description = "Exception occurred while updating list", schema =
+            @Schema(type = "string")), content = @Content)
+    })
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequestMapping(method = RequestMethod.DELETE, value = "/{listId}")
+    public ResponseEntity<Void> deleteList(@PathVariable("listId") final String listId) {
         return ResponseEntity.ok().build();
     }
 
