@@ -2,6 +2,7 @@ package cs.vapo.bringit.core.controller;
 
 import cs.vapo.bringit.core.model.user.CreateUser;
 import cs.vapo.bringit.core.model.user.PatchUser;
+import cs.vapo.bringit.core.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,6 +30,9 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class UserController {
 
+    @Autowired
+    private UserService userService;
+
     @Operation(summary = "Creates a new user")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "User was successfully created", headers = @Header(
@@ -43,6 +48,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<Void> createUser(@RequestBody @Valid final CreateUser createUserRequest) throws URISyntaxException {
+        userService.createUser(createUserRequest);
         return ResponseEntity.created(new URI("")).build();
     }
 
