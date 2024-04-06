@@ -1,8 +1,6 @@
 package cs.vapo.bringit.core.controller;
 
-import cs.vapo.bringit.core.model.user.CreateUser;
-import cs.vapo.bringit.core.model.user.GetUser;
-import cs.vapo.bringit.core.model.user.PatchUser;
+import cs.vapo.bringit.core.model.user.*;
 import cs.vapo.bringit.core.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -33,6 +31,13 @@ public class UserController {
         this.userService = userService;
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PostMapping(value = "/v1/users/login")
+    public ResponseEntity<Void> loginUser(@RequestBody @Valid final LoginUser loginUserRequest) {
+        userService.loginUser(loginUserRequest);
+        return ResponseEntity.noContent().build();
+    }
+
     @Operation(summary = "Creates a new user")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User was successfully created", headers = @Header(
@@ -48,8 +53,9 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/v1/users")
     public ResponseEntity<Void> createUser(@RequestBody @Valid final CreateUser createUserRequest) throws URISyntaxException {
-        final String userId = userService.createUser(createUserRequest);
-        return ResponseEntity.created(new URI(String.format("/v1/users/%s", userId))).build();
+        final CreateUserResponse createUserData = userService.createUser(createUserRequest);
+        return ResponseEntity.created(new URI(String.format("/v1/users/%s", createUserData.getUserId())))
+                .header("JWT", createUserData.getJwt()).build();
     }
 
     @Operation(summary = "Gets the current user")

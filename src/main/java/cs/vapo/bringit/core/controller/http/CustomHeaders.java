@@ -1,4 +1,4 @@
-package cs.vapo.bringit.core.controller.headers;
+package cs.vapo.bringit.core.controller.http;
 
 public class CustomHeaders {
 

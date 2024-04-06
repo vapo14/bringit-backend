@@ -1,14 +1,12 @@
 package cs.vapo.bringit.core.controller;
 
-import cs.vapo.bringit.core.controller.headers.CustomHeaders;
+import cs.vapo.bringit.core.controller.http.CustomHeaders;
 import cs.vapo.bringit.core.exceptions.BadRequestException;
 import cs.vapo.bringit.core.exceptions.InternalServerException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-
-import java.lang.invoke.MethodHandles;
 
 @ControllerAdvice
 public class CustomExceptionHandler {
