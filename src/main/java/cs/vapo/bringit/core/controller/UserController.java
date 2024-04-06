@@ -117,6 +117,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping(value = "/v1/users/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable("userId") final String userId) {
+        userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
 }

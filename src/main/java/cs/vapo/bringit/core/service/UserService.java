@@ -5,6 +5,7 @@ import cs.vapo.bringit.core.dao.model.UserDM;
 import cs.vapo.bringit.core.dao.model.UserForLoginDM;
 import cs.vapo.bringit.core.dao.user.UserDataService;
 import cs.vapo.bringit.core.exceptions.BadRequestException;
+import cs.vapo.bringit.core.logging.LogMethodEntry;
 import cs.vapo.bringit.core.model.user.CreateUser;
 import cs.vapo.bringit.core.model.user.GetUser;
 import cs.vapo.bringit.core.model.user.PatchUser;
@@ -43,8 +44,8 @@ public class UserService {
      * @param createUserRequest the create user request data
      */
     @Transactional
+    @LogMethodEntry
     public String createUser(final @Valid CreateUser createUserRequest) {
-        // TODO: implement aspect oriented programming for logging
         final UserForLoginDM userData = new UserForLoginDM();
         userData.setUsername(createUserRequest.getUsername());
         userData.setEmail(createUserRequest.getEmail());
@@ -58,6 +59,7 @@ public class UserService {
      * @return the user data
      */
     @Transactional
+    @LogMethodEntry
     public GetUser retrieveUser(final String userId) {
         final UserDM userData = userDataService.findUserById(userId);
         return modelMapper.map(userData, GetUser.class);
@@ -69,6 +71,7 @@ public class UserService {
      * @param userData the updated user data
      */
     @Transactional
+    @LogMethodEntry
     public void updateUser(final String userId, final PatchUser userData) {
         final boolean passwordUpdated = StringUtils.isNotBlank(userData.getPassword());
         if (passwordUpdated) {
@@ -91,5 +94,17 @@ public class UserService {
         if (!StringUtils.equals(userData.getPassword(), userData.getConfirmPassword())) {
             throw new BadRequestException("Passwords do not match, please confirm your password.");
         }
+    }
+
+    /**
+     * Deletes the user that corresponds to the provided userId
+     * @param userId the userId to delete
+     */
+    @Transactional
+    @LogMethodEntry
+    public void deleteUser(final String userId) {
+        // TODO: before deleting the user, check what lists are owned by the user and delete those first.
+        // what if the lists are not deleted but rather scheduled for deletion after a period of time ?
+        // first validate if the user is actually logged in. Only the user logged in can delete their own account.
     }
 }
