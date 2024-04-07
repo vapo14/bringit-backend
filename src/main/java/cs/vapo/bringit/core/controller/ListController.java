@@ -35,6 +35,7 @@ public class ListController {
             @ApiResponse(responseCode = "201", description = "List was successfully created", headers = @Header(
                     name = "Resource-Id", description = "The location of the created resource", schema =
             @Schema(type = "string")), content = @Content),
+            @ApiResponse(responseCode = "403", description = "User is not logged in"),
             @ApiResponse(responseCode = "400", description = "Bad Request", headers = @Header(
                     name = "Error-Message", description = "Validation failed for request field", schema =
             @Schema(type = "string")), content = @Content),
@@ -54,6 +55,7 @@ public class ListController {
             @ApiResponse(responseCode = "400", description = "Bad Request", headers = @Header(
                     name = "Error-Message", description = "Validation failed for request field", schema =
             @Schema(type = "string")), content = @Content),
+            @ApiResponse(responseCode = "403", description = "User is not logged in"),
             @ApiResponse(responseCode = "404", description = "The given user was not found", headers = @Header(name =
                     "Error-Message", description = "The given user was not found", schema = @Schema(type = "string"))
                     , content = @Content),
@@ -76,11 +78,7 @@ public class ListController {
             @ApiResponse(responseCode = "404", description = "The given list was not found", headers = @Header(name =
                     "Error-Message", description = "The given list was not found", schema = @Schema(type = "string"))
                     , content = @Content),
-            @ApiResponse(responseCode = "401", description = "The current user is not the owner of the requested list", headers =
-            @Header(name =
-                    "Error-Message", description = "The requested list does not belong to this user", schema =
-            @Schema(type = "string"))
-                    , content = @Content),
+            @ApiResponse(responseCode = "403", description = "User is not logged in"),
             @ApiResponse(responseCode = "500", description = "The server encountered an unexpected error", headers =
             @Header(name = "Error-Message", description = "Exception occurred while creating list", schema =
             @Schema(type = "string")), content = @Content)
@@ -100,11 +98,7 @@ public class ListController {
             @ApiResponse(responseCode = "404", description = "The given list was not found", headers = @Header(name =
                     "Error-Message", description = "The given list was not found", schema = @Schema(type = "string"))
                     , content = @Content),
-            @ApiResponse(responseCode = "401", description = "The current user is not the owner of the requested list", headers =
-            @Header(name =
-                    "Error-Message", description = "The requested list does not belong to this user", schema =
-            @Schema(type = "string"))
-                    , content = @Content),
+            @ApiResponse(responseCode = "403", description = "User is not logged in"),
             @ApiResponse(responseCode = "500", description = "The server encountered an unexpected error", headers =
             @Header(name = "Error-Message", description = "Exception occurred while updating list", schema =
             @Schema(type = "string")), content = @Content)
@@ -125,11 +119,7 @@ public class ListController {
             @ApiResponse(responseCode = "404", description = "The given list was not found", headers = @Header(name =
                     "Error-Message", description = "The given list was not found", schema = @Schema(type = "string"))
                     , content = @Content),
-            @ApiResponse(responseCode = "401", description = "The current user is not the owner of the requested list", headers =
-            @Header(name =
-                    "Error-Message", description = "The requested list does not belong to this user", schema =
-            @Schema(type = "string"))
-                    , content = @Content),
+            @ApiResponse(responseCode = "403", description = "User is not logged in"),
             @ApiResponse(responseCode = "500", description = "The server encountered an unexpected error", headers =
             @Header(name = "Error-Message", description = "Exception occurred while updating list", schema =
             @Schema(type = "string")), content = @Content)

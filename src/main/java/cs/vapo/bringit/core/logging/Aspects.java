@@ -14,7 +14,7 @@ import java.lang.invoke.MethodHandles;
 @Component
 public class Aspects {
 
-    private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().getClass());
+    private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Before("@annotation(cs.vapo.bringit.core.logging.LogMethodEntry)")
     public void logEnteringMethod(final JoinPoint joinPoint) {
