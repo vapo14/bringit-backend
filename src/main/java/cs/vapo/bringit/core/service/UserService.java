@@ -7,17 +7,26 @@ import cs.vapo.bringit.core.dao.user.UserDataService;
 import cs.vapo.bringit.core.exceptions.BadRequestException;
 import cs.vapo.bringit.core.logging.LogMethodEntry;
 import cs.vapo.bringit.core.model.user.CreateUser;
+import cs.vapo.bringit.core.model.user.CreateUserResponse;
 import cs.vapo.bringit.core.model.user.GetUser;
+import cs.vapo.bringit.core.model.user.LoginUser;
 import cs.vapo.bringit.core.model.user.PatchUser;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
+import java.lang.invoke.MethodHandles;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,32 +34,44 @@ import java.util.Set;
 @Validated
 public class UserService {
 
+    private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final UserDataService userDataService;
 
     private final PasswordEncoder passwordEncoder;
 
     private final ModelMapper modelMapper;
 
+    private final JwtService jwtService;
+
+    private final AuthenticationManager authManager;
+
     @Autowired
     public UserService(final UserDataService userDataService, final PasswordEncoder passwordEncoder,
-                       final ModelMapper modelMapper) {
+                       final ModelMapper modelMapper, final JwtService jwtService,
+                       final AuthenticationManager authManager) {
         this.userDataService = userDataService;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
+        this.jwtService = jwtService;
+        this.authManager = authManager;
     }
 
     /**
-     * Creates the user with the given data
+     * Creates and authenticates the user with the given data
      * @param createUserRequest the create user request data
      */
     @Transactional
     @LogMethodEntry
-    public String createUser(final @Valid CreateUser createUserRequest) {
+    public CreateUserResponse createUser(final @Valid CreateUser createUserRequest) {
         final UserForLoginDM userData = new UserForLoginDM();
         userData.setUsername(createUserRequest.getUsername());
         userData.setEmail(createUserRequest.getEmail());
         userData.setPassword(passwordEncoder.encode(createUserRequest.getPassword()));
-        return userDataService.createUser(userData);
+        final CreateUserResponse responseData = new CreateUserResponse();
+        responseData.setUserId(userDataService.createUser(userData));
+        responseData.setJwt(jwtService.generateToken(new HashMap<>(), userData));
+        return responseData;
     }
 
     /**
@@ -61,8 +82,22 @@ public class UserService {
     @Transactional
     @LogMethodEntry
     public GetUser retrieveUser(final String userId) {
+        validateSessionOwner(userId);
         final UserDM userData = userDataService.findUserById(userId);
         return modelMapper.map(userData, GetUser.class);
+    }
+
+    /**
+     * Logs in a user and generates the corresponding jwt token.
+     * @param request the login request info
+     * @return the jwt token for the authenticated user
+     */
+    @Transactional
+    public String loginUser(final LoginUser request) {
+        authManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
+        final UserForLoginDM userData = userDataService.findUserByUsernameForLogin(request.getUsername());
+        return jwtService.generateToken(new HashMap<>(), userData);
     }
 
     /**
@@ -73,6 +108,7 @@ public class UserService {
     @Transactional
     @LogMethodEntry
     public void updateUser(final String userId, final PatchUser userData) {
+        validateSessionOwner(userId);
         final boolean passwordUpdated = StringUtils.isNotBlank(userData.getPassword());
         if (passwordUpdated) {
             validatePasswordFields(userData);
@@ -103,8 +139,21 @@ public class UserService {
     @Transactional
     @LogMethodEntry
     public void deleteUser(final String userId) {
-        // TODO: before deleting the user, check what lists are owned by the user and delete those first.
+        validateSessionOwner(userId);
         // what if the lists are not deleted but rather scheduled for deletion after a period of time ?
         // first validate if the user is actually logged in. Only the user logged in can delete their own account.
+    }
+
+    /**
+     * Evaluates if the given user is the owner of the current session.
+     * @param userId presumed session owner userId
+     * @throws BadRequestException if the userId does not belong to the current session
+     */
+    public void validateSessionOwner(final String userId) throws BadRequestException {
+        final UserForLoginDM principal =
+                (UserForLoginDM) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (!StringUtils.equals(principal.getId(), userId)) {
+            throw new BadRequestException("UserId does not belong to the current session.");
+        }
     }
 }

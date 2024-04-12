@@ -1,17 +1,24 @@
 package cs.vapo.bringit.core.controller;
 
-import cs.vapo.bringit.core.controller.headers.CustomHeaders;
+import cs.vapo.bringit.core.controller.http.CustomHeaders;
 import cs.vapo.bringit.core.exceptions.BadRequestException;
 import cs.vapo.bringit.core.exceptions.InternalServerException;
 import jakarta.persistence.EntityNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @ControllerAdvice
 public class CustomExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @ExceptionHandler(value = BadRequestException.class)
     public ResponseEntity<Object> badRequestHandler(final Exception badRequestException) {
@@ -23,6 +30,13 @@ public class CustomExceptionHandler {
     public ResponseEntity<Object> notFoundHandler(final Exception notFoundException) {
         final String expMessage = notFoundException.getMessage();
         return ResponseEntity.notFound().header(CustomHeaders.ERROR_MESSAGE_HEADER, expMessage).build();
+
+    }
+
+    @ExceptionHandler(value = SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<Object> conflictHandler(final Exception conflictException) {
+        log.error("Conflict exception: {}", conflictException.getMessage(), conflictException);
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
 
     }
 
