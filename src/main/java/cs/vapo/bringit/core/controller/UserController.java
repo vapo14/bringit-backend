@@ -89,9 +89,9 @@ public class UserController {
             @Schema(type = "string")), content = @Content)
     })
     @ResponseStatus(HttpStatus.OK)
-    @GetMapping( value = "/v1/users/{userId}")
-    public ResponseEntity<GetUser> getCurrentUser(@PathVariable("userId") final String userId) {
-        return ResponseEntity.ok(userService.retrieveUser(userId));
+    @GetMapping( value = "/v1/users")
+    public ResponseEntity<GetUser> getCurrentUser() {
+        return ResponseEntity.ok(userService.retrieveCurrentUser());
     }
 
     @Operation(summary = "Updates the current user")
@@ -109,10 +109,9 @@ public class UserController {
             @Schema(type = "string")), content = @Content)
     })
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PatchMapping(value = "/v1/users/{userId}")
-    public ResponseEntity<Void> updateUser(@PathVariable("userId") final String userId,
-                                           @RequestBody @Valid final PatchUser updateUserRequest) {
-        userService.updateUser(userId, updateUserRequest);
+    @PatchMapping(value = "/v1/users")
+    public ResponseEntity<Void> updateUser(@RequestBody @Valid final PatchUser updateUserRequest) {
+        userService.updateCurrentUser(updateUserRequest);
         return ResponseEntity.noContent().build();
     }
 
@@ -131,9 +130,9 @@ public class UserController {
             @Schema(type = "string")), content = @Content)
     })
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping(value = "/v1/users/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("userId") final String userId) {
-        userService.deleteUser(userId);
+    @DeleteMapping(value = "/v1/users")
+    public ResponseEntity<Void> deleteUser() {
+        userService.deleteCurrentUser();
         return ResponseEntity.noContent().build();
     }
 }

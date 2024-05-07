@@ -11,6 +11,7 @@ import cs.vapo.bringit.core.model.user.CreateUserResponse;
 import cs.vapo.bringit.core.model.user.GetUser;
 import cs.vapo.bringit.core.model.user.LoginUser;
 import cs.vapo.bringit.core.model.user.PatchUser;
+import cs.vapo.bringit.core.tools.CurrentUserTools;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -20,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -76,13 +76,12 @@ public class UserService {
 
     /**
      * Fetches the user data from the repository
-     * @param userId the userId to retrieve
      * @return the user data
      */
     @Transactional
     @LogMethodEntry
-    public GetUser retrieveUser(final String userId) {
-        validateSessionOwner(userId);
+    public GetUser retrieveCurrentUser() {
+        final String userId = CurrentUserTools.retrieveCurrentUserId();
         final UserDM userData = userDataService.findUserById(userId);
         return modelMapper.map(userData, GetUser.class);
     }
@@ -93,7 +92,7 @@ public class UserService {
      * @return the jwt token for the authenticated user
      */
     @Transactional
-    public String loginUser(final LoginUser request) {
+    public String loginUser(@Valid final LoginUser request) {
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
         final UserForLoginDM userData = userDataService.findUserByUsernameForLogin(request.getUsername());
@@ -102,13 +101,12 @@ public class UserService {
 
     /**
      * Updates the user in the repository
-     * @param userId the user id to update
      * @param userData the updated user data
      */
     @Transactional
     @LogMethodEntry
-    public void updateUser(final String userId, final PatchUser userData) {
-        validateSessionOwner(userId);
+    public void updateCurrentUser(final PatchUser userData) {
+        final String userId = CurrentUserTools.retrieveCurrentUserId();
         final boolean passwordUpdated = StringUtils.isNotBlank(userData.getPassword());
         if (passwordUpdated) {
             validatePasswordFields(userData);
@@ -134,26 +132,12 @@ public class UserService {
 
     /**
      * Deletes the user that corresponds to the provided userId
-     * @param userId the userId to delete
      */
     @Transactional
     @LogMethodEntry
-    public void deleteUser(final String userId) {
-        validateSessionOwner(userId);
-        // what if the lists are not deleted but rather scheduled for deletion after a period of time ?
-        // first validate if the user is actually logged in. Only the user logged in can delete their own account.
+    public void deleteCurrentUser() {
+        final String userId = CurrentUserTools.retrieveCurrentUserId();
+        userDataService.deleteUser(userId);
     }
 
-    /**
-     * Evaluates if the given user is the owner of the current session.
-     * @param userId presumed session owner userId
-     * @throws BadRequestException if the userId does not belong to the current session
-     */
-    public void validateSessionOwner(final String userId) throws BadRequestException {
-        final UserForLoginDM principal =
-                (UserForLoginDM) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (!StringUtils.equals(principal.getId(), userId)) {
-            throw new BadRequestException("UserId does not belong to the current session.");
-        }
-    }
 }
