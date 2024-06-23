@@ -2,15 +2,15 @@ package cs.vapo.bringit.core.model.user;
 
 public class CreateUserResponse {
 
-    private String userId;
+    private long userId;
 
     private String jwt;
 
-    public String getUserId() {
+    public long getUserId() {
         return userId;
     }
 
-    public void setUserId(String userId) {
+    public void setUserId(long userId) {
         this.userId = userId;
     }
 

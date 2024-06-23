@@ -3,6 +3,9 @@ package cs.vapo.bringit.core.model.lists;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
+/**
+ * This model is meant to be used for displaying the user's list at a high level view.
+ */
 @Schema
 public class ListInformationBasic {
 

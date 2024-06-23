@@ -13,7 +13,7 @@ public class CurrentUserTools {
      * Retrieves the current authenticated user's ID from the Security Context.
      * @return the current user's ID
      */
-    public static String retrieveCurrentUserId() {
+    public static long retrieveCurrentUserId() {
         final UserForLoginDM principal =
                 (UserForLoginDM) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return principal.getId();

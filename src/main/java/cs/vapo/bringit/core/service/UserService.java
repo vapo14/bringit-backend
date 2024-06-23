@@ -81,7 +81,7 @@ public class UserService {
     @Transactional
     @LogMethodEntry
     public GetUser retrieveCurrentUser() {
-        final String userId = CurrentUserTools.retrieveCurrentUserId();
+        final long userId = CurrentUserTools.retrieveCurrentUserId();
         final UserDM userData = userDataService.findUserById(userId);
         return modelMapper.map(userData, GetUser.class);
     }
@@ -106,7 +106,7 @@ public class UserService {
     @Transactional
     @LogMethodEntry
     public void updateCurrentUser(final PatchUser userData) {
-        final String userId = CurrentUserTools.retrieveCurrentUserId();
+        final long userId = CurrentUserTools.retrieveCurrentUserId();
         final boolean passwordUpdated = StringUtils.isNotBlank(userData.getPassword());
         if (passwordUpdated) {
             validatePasswordFields(userData);
@@ -136,7 +136,7 @@ public class UserService {
     @Transactional
     @LogMethodEntry
     public void deleteCurrentUser() {
-        final String userId = CurrentUserTools.retrieveCurrentUserId();
+        final long userId = CurrentUserTools.retrieveCurrentUserId();
         userDataService.deleteUser(userId);
     }
 

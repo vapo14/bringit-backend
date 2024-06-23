@@ -3,6 +3,7 @@ package cs.vapo.bringit.core.controller;
 import cs.vapo.bringit.core.model.lists.CreateList;
 import cs.vapo.bringit.core.model.lists.ListInformationBasic;
 import cs.vapo.bringit.core.model.lists.PatchList;
+import cs.vapo.bringit.core.service.ListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,9 +27,11 @@ import org.springframework.web.bind.annotation.*;
 @Validated
 public class ListController {
 
+    private final ListService listService;
+
     @Autowired
-    public ListController() {
-        // no dependencies added yet
+    public ListController(final ListService listService) {
+        this.listService = listService;
     }
 
     @Operation(summary = "Creates a new list")
@@ -45,7 +49,8 @@ public class ListController {
     })
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping(value = "/v1/lists")
-    public ResponseEntity<Void> createList(@RequestBody final CreateList listData) throws URISyntaxException {
+    public ResponseEntity<Void> createList(@RequestBody @Valid final CreateList listData) throws URISyntaxException {
+        listService.createList(listData);
         return ResponseEntity.created(new URI("")).build();
     }
 
@@ -66,7 +71,7 @@ public class ListController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/v1/lists")
     public ResponseEntity<ListInformationBasic> retrieveUsersLists(@RequestParam final String userId) {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(listService.getUserLists());
     }
 
     @Operation(summary = "Gets a list's details")
