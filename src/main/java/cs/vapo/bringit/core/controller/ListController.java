@@ -1,6 +1,7 @@
 package cs.vapo.bringit.core.controller;
 
 import cs.vapo.bringit.core.model.lists.CreateList;
+import cs.vapo.bringit.core.model.lists.ListDetails;
 import cs.vapo.bringit.core.model.lists.ListInformationBasic;
 import cs.vapo.bringit.core.model.lists.PatchList;
 import cs.vapo.bringit.core.service.ListService;
@@ -13,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +72,7 @@ public class ListController {
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/v1/lists")
-    public ResponseEntity<ListInformationBasic> retrieveUsersLists(@RequestParam final String userId) {
+    public ResponseEntity<List<ListInformationBasic>> retrieveUsersLists() {
         return ResponseEntity.ok(listService.getUserLists());
     }
 
@@ -90,8 +92,8 @@ public class ListController {
     })
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/v1/lists/{listId}")
-    public ResponseEntity<Void> retrieveListInformation(@PathVariable("listId") final String listId) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ListDetails> retrieveListInformation(@PathVariable("listId") final String listId) {
+        return ResponseEntity.ok(new ListDetails());
     }
 
     @Operation(summary = "Updates a list's attributes")

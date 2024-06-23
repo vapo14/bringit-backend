@@ -11,8 +11,8 @@ public class Item {
     @Schema(description = "The item description", example = "Make sure it's Diet Coke")
     private String description;
 
-    @Schema(description = "The item count, how many the person should bring", example = "2")
-    private int count;
+    @Schema(description = "The item quantity, how many the person should bring", example = "2")
+    private int quantity;
 
     @Schema(description = "The item's image url / icon url")
     private String imageUrl;
@@ -36,12 +36,12 @@ public class Item {
         this.description = description;
     }
 
-    public int getCount() {
-        return count;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public String getImageUrl() {
