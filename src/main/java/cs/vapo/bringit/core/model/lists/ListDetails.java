@@ -1,15 +1,13 @@
 package cs.vapo.bringit.core.model.lists;
 
+import cs.vapo.bringit.core.model.lists.item.Item;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.util.List;
 
-/**
- * This model is meant to be used for displaying the user's list at a high level view.
- */
 @Schema
-public class ListInformationBasic {
+public class ListDetails {
 
     @Schema(description = "The list's identifier")
     private String id;
@@ -26,8 +24,8 @@ public class ListInformationBasic {
     @Schema(description = "The list's owner profile picture URL", example = "https://example.com/img-path")
     private String ownerImgUrl;
 
-    @Schema(description = "The participant profile picture URLs")
-    private List<String> participantImgUrls;
+    @Schema(description = "The list's items")
+    private List<Item> items;
 
     public String getId() {
         return id;
@@ -53,6 +51,14 @@ public class ListInformationBasic {
         this.itemCount = itemCount;
     }
 
+    public LocalDate getEventDate() {
+        return eventDate;
+    }
+
+    public void setEventDate(LocalDate eventDate) {
+        this.eventDate = eventDate;
+    }
+
     public String getOwnerImgUrl() {
         return ownerImgUrl;
     }
@@ -61,19 +67,11 @@ public class ListInformationBasic {
         this.ownerImgUrl = ownerImgUrl;
     }
 
-    public List<String> getParticipantImgUrls() {
-        return participantImgUrls;
+    public List<Item> getItems() {
+        return items;
     }
 
-    public void setParticipantImgUrls(List<String> participantImgUrls) {
-        this.participantImgUrls = participantImgUrls;
-    }
-
-    public LocalDate getEventDate() {
-        return eventDate;
-    }
-
-    public void setEventDate(LocalDate eventDate) {
-        this.eventDate = eventDate;
+    public void setItems(List<Item> items) {
+        this.items = items;
     }
 }

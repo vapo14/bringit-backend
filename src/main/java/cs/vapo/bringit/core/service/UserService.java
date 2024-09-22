@@ -1,5 +1,6 @@
 package cs.vapo.bringit.core.service;
 
+import cs.vapo.bringit.core.config.ApplicationConfiguration;
 import cs.vapo.bringit.core.dao.mapper.MapperUtils;
 import cs.vapo.bringit.core.dao.model.UserDM;
 import cs.vapo.bringit.core.dao.model.UserForLoginDM;
@@ -11,7 +12,10 @@ import cs.vapo.bringit.core.model.user.CreateUserResponse;
 import cs.vapo.bringit.core.model.user.GetUser;
 import cs.vapo.bringit.core.model.user.LoginUser;
 import cs.vapo.bringit.core.model.user.PatchUser;
+import cs.vapo.bringit.core.model.user.SearchUserRequest;
+import cs.vapo.bringit.core.model.user.contact.ContactRequest;
 import cs.vapo.bringit.core.tools.CurrentUserTools;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +23,7 @@ import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,6 +33,7 @@ import org.springframework.validation.annotation.Validated;
 import java.lang.invoke.MethodHandles;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -46,15 +52,18 @@ public class UserService {
 
     private final AuthenticationManager authManager;
 
+    private final ApplicationConfiguration configuration;
+
     @Autowired
     public UserService(final UserDataService userDataService, final PasswordEncoder passwordEncoder,
                        final ModelMapper modelMapper, final JwtService jwtService,
-                       final AuthenticationManager authManager) {
+                       final AuthenticationManager authManager, final ApplicationConfiguration configuration) {
         this.userDataService = userDataService;
         this.passwordEncoder = passwordEncoder;
         this.modelMapper = modelMapper;
         this.jwtService = jwtService;
         this.authManager = authManager;
+        this.configuration = configuration;
     }
 
     /**
@@ -81,7 +90,7 @@ public class UserService {
     @Transactional
     @LogMethodEntry
     public GetUser retrieveCurrentUser() {
-        final String userId = CurrentUserTools.retrieveCurrentUserId();
+        final long userId = CurrentUserTools.retrieveCurrentUserId();
         final UserDM userData = userDataService.findUserById(userId);
         return modelMapper.map(userData, GetUser.class);
     }
@@ -106,7 +115,7 @@ public class UserService {
     @Transactional
     @LogMethodEntry
     public void updateCurrentUser(final PatchUser userData) {
-        final String userId = CurrentUserTools.retrieveCurrentUserId();
+        final long userId = CurrentUserTools.retrieveCurrentUserId();
         final boolean passwordUpdated = StringUtils.isNotBlank(userData.getPassword());
         if (passwordUpdated) {
             validatePasswordFields(userData);
@@ -136,8 +145,38 @@ public class UserService {
     @Transactional
     @LogMethodEntry
     public void deleteCurrentUser() {
-        final String userId = CurrentUserTools.retrieveCurrentUserId();
+        final long userId = CurrentUserTools.retrieveCurrentUserId();
         userDataService.deleteUser(userId);
     }
 
+    /**
+     * Searches for a user given its username
+     * @param request the search request
+     * @return the UserDM if found
+     */
+    public GetUser searchUserByUsername(final SearchUserRequest request) {
+        GetUser userData = null;
+        try {
+            userData = modelMapper.map(userDataService.findUserByUsername(request.getUsername()), GetUser.class);
+        } catch (final EntityNotFoundException exp) {
+            log.info(exp.getMessage());
+        }
+        return userData;
+    }
+
+    /**
+     * Adds a contact to a user's contact list.
+     * @param request the contact request
+     */
+    public void addContact(final ContactRequest request) {
+        final long currentUserId = CurrentUserTools.retrieveCurrentUserId();
+        userDataService.addContact(currentUserId, Long.parseLong(request.getContactId()));
+    }
+
+    public List<GetUser> retrieveUserContacts(final int pageNumber) {
+        final long currentUserId = CurrentUserTools.retrieveCurrentUserId();
+        List<UserDM> results = userDataService.retrieveUserContacts(currentUserId,
+                PageRequest.of(pageNumber, configuration.getUserContactsListPageSize()));
+        return MapperUtils.mapList(results, GetUser.class);
+    }
 }
