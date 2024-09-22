@@ -1,17 +1,20 @@
 package cs.vapo.bringit.core.model.lists.item;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 
 @Schema
 public class Item {
 
-    @Schema(description = "The item name", example = "Coke")
+    @Schema(description = "The item name", example = "Coke", requiredMode = Schema.RequiredMode.REQUIRED)
+    @NotBlank
     private String name;
 
     @Schema(description = "The item description", example = "Make sure it's Diet Coke")
     private String description;
 
-    @Schema(description = "The item quantity, how many the person should bring", example = "2")
+    @Schema(description = "The item quantity, how many the person should bring", example = "2",
+            requiredMode = Schema.RequiredMode.REQUIRED)
     private int quantity;
 
     @Schema(description = "The item's image url / icon url")

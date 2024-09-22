@@ -17,6 +17,13 @@ public class ApplicationConfiguration {
     @Value("${bringit.security.jwt.signing.key}")
     private String jwtSigningKey;
 
+    @Value("${bringit.config.user.contacts.pageSize}")
+    private int userContactsListPageSize;
+
+    public int getUserContactsListPageSize() {
+        return userContactsListPageSize;
+    }
+
     public String getJwtSigningKey() {
         return jwtSigningKey;
     }

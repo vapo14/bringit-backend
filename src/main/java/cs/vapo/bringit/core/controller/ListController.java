@@ -4,6 +4,7 @@ import cs.vapo.bringit.core.model.lists.CreateList;
 import cs.vapo.bringit.core.model.lists.ListDetails;
 import cs.vapo.bringit.core.model.lists.ListInformationBasic;
 import cs.vapo.bringit.core.model.lists.PatchList;
+import cs.vapo.bringit.core.model.lists.item.Item;
 import cs.vapo.bringit.core.service.ListService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -135,6 +136,28 @@ public class ListController {
     @DeleteMapping(value = "/v1/lists/{listId}")
     public ResponseEntity<Void> deleteList(@PathVariable("listId") final String listId) {
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Adds an item to the given list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Item was successfully added"),
+            @ApiResponse(responseCode = "400", description = "Bad Request", headers = @Header(
+                    name = "Error-Message", description = "Validation failed for request field", schema =
+            @Schema(type = "string")), content = @Content),
+            @ApiResponse(responseCode = "404", description = "The given list was not found", headers = @Header(name =
+                    "Error-Message", description = "The given list was not found", schema = @Schema(type = "string"))
+                    , content = @Content),
+            @ApiResponse(responseCode = "403", description = "User is not logged in"),
+            @ApiResponse(responseCode = "500", description = "The server encountered an unexpected error", headers =
+            @Header(name = "Error-Message", description = "Exception occurred while adding item", schema =
+            @Schema(type = "string")), content = @Content)
+    })
+    @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping(value = "/v1/lists/{listId}/items")
+    public ResponseEntity<Void> addItem(@PathVariable("listId") final String listId, @RequestBody final Item itemInfo)
+            throws URISyntaxException {
+        listService.addItem(listId, itemInfo);
+        return ResponseEntity.created(new URI(String.format("/v1/lists/%s", listId))).build();
     }
 
 }
