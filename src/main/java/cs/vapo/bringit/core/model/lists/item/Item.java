@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 @Schema
 public class Item {
 
+    @Schema(description = "The item id")
+    private String itemId;
+
     @Schema(description = "The item name", example = "Coke", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank
     private String name;
@@ -53,5 +56,13 @@ public class Item {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public String getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
     }
 }

@@ -5,6 +5,7 @@ import cs.vapo.bringit.core.dao.model.ItemDM;
 import cs.vapo.bringit.core.dao.model.ListDM;
 import cs.vapo.bringit.core.exceptions.BadRequestException;
 import cs.vapo.bringit.core.model.lists.CreateList;
+import cs.vapo.bringit.core.model.lists.ListDetails;
 import cs.vapo.bringit.core.model.lists.ListInformationBasic;
 import cs.vapo.bringit.core.model.lists.item.Item;
 import cs.vapo.bringit.core.tools.CurrentUserTools;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ListService {
@@ -44,6 +46,7 @@ public class ListService {
         final ListDM newList = new ListDM();
         newList.setTitle(request.getTitle());
         newList.setEventDate(request.getEventDate());
+        final ItemDM item = new ItemDM();
         dataService.createList(ownerId, newList);
     }
 
@@ -64,6 +67,35 @@ public class ListService {
             listInfo.setEventDate(list.getEventDate());
             return listInfo;
         }).toList();
+    }
+
+    /**
+     * Retrieves the current user's lists
+     * @return Lists that belong to the current logged-in user
+     */
+    @Transactional
+    public ListDetails getUserListDetails(final String listId) {
+        final long listIdLong = Long.parseLong(listId);
+        final long userId = CurrentUserTools.retrieveCurrentUserId();
+        final ListDM list = dataService.findListById(listIdLong);
+        if (!isOwner(userId, list.getId())) {
+            throw new BadRequestException("The current user does not own the given list");
+        }
+        final ListDetails listInfo = new ListDetails();
+        listInfo.setId(String.valueOf(list.getId()));
+        listInfo.setTitle(list.getTitle());
+        listInfo.setItemCount(list.getItemCount());
+        listInfo.setEventDate(list.getEventDate());
+        listInfo.setItems(list.getItems().stream().map(element -> {
+            final Item item = new Item();
+            item.setItemId(String.valueOf(element.getId()));
+            item.setName(element.getName());
+            item.setDescription(element.getDescription());
+            item.setImageUrl(element.getImage());
+            item.setQuantity(element.getQuantity());
+            return item;
+        }).collect(Collectors.toList()));
+        return listInfo;
     }
 
     /**

@@ -94,7 +94,7 @@ public class ListController {
     @ResponseStatus(HttpStatus.OK)
     @GetMapping(value = "/v1/lists/{listId}")
     public ResponseEntity<ListDetails> retrieveListInformation(@PathVariable("listId") final String listId) {
-        return ResponseEntity.ok(new ListDetails());
+        return ResponseEntity.ok(listService.getUserListDetails(listId));
     }
 
     @Operation(summary = "Updates a list's attributes")
