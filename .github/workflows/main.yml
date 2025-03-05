@@ -9,6 +9,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+    - name: Build DAO
+      run: |
+        git clone --depth 1 https://github.com/vapo14/bringit-dao.git
+        cd bringit-dao
+        mvn install
+        cd ../
+        rm -r bringit-dao
+        
     - name: Checkout code
       uses: actions/checkout@v4
     
