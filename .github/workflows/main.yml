@@ -51,15 +51,14 @@ jobs:
           WG_CONFIG_FILE: ${{ secrets.WG_CONFIG_FILE }}
           
       - name: Deploy JAR to server
-        #run: scp ./*.jar ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.SERVER_JAR_PATH }}
-        run: traceroute ${{ secrets.SERVER_IP }}
+        run: scp ./*.jar ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.SERVER_JAR_PATH }}
 
-      #- name: Restart server
-      #  uses: appleboy/ssh-action@v1.2.1
-      #  with:
-      #    host: ${{ secrets.SERVER_IP }}
-      #    username: ${{ secrets.SERVER_USER }}
-      #    key: ${{ secrets.SSH_KEY }}
-      #    script: sudo systemctl start bringit_core
+      - name: Restart server
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: sudo systemctl start bringit_core
 
 
