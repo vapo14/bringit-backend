@@ -51,7 +51,7 @@ jobs:
           WG_CONFIG_FILE: ${{ secrets.WG_CONFIG_FILE }}
           
       - name: Deploy JAR to server
-        run: scp ./*.jar ${{secrets.SERVER_USER}}@${{secrets.SERVER_IP}}:${{secrets.SERVER_JAR_PATH}}
+        run: scp ./*.jar ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:${{ secrets.SERVER_JAR_PATH }}
 
       - name: Restart server
         uses: appleboy/ssh-action@v1.2.1
