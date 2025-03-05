@@ -80,6 +80,13 @@
 			<version>${jwt-dependencies-version}</version>
 		</dependency>
 		<!-- end JWT dependencies -->
+		<!-- H2 dependency for tests -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<!-- end H2 dependency -->
 	</dependencies>
 
 	<build>
